@@ -2,18 +2,15 @@ package com.tks.cppcgviewer;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.PixelFormat;
 import android.os.Bundle;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.widget.TextView;
 
 import com.tks.cppcgviewer.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
-
-    // Used to load the 'cppcgviewer' library on application startup.
-    static {
-        System.loadLibrary("cppcgviewer");
-    }
-
     private ActivityMainBinding binding;
 
     @Override
@@ -23,14 +20,39 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Example of a call to a native method
-        TextView tv = binding.sampleText;
-        tv.setText(stringFromJNI());
+        SurfaceView surface = binding.surfaceview;;
+        /* 透過設定 */
+        surface.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+        surface.setZOrderOnTop(true);
+
+        /* コールバック設定 */
+        surface.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                Jni.surfaceCreated(holder.getSurface());
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+                Jni.surfaceChanged(width, height);
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                Jni.surfaceDestroyed();
+            }
+        });
     }
 
-    /**
-     * A native method that is implemented by the 'cppcgviewer' native library,
-     * which is packaged with this application.
-     */
-    public native String stringFromJNI();
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Jni.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Jni.onStop();
+    }
 }
