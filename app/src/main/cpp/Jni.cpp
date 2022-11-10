@@ -12,9 +12,9 @@ extern "C" {
 #endif
 
 JNIEXPORT jboolean JNICALL Java_com_tks_cppcgviewer_Jni_onStart(JNIEnv *env, jclass clazz, jobject assets,
-                                                            jobjectArray modelnames, jobjectArray md2filenames,
-                                                            jobjectArray texfilenames, jobjectArray vshfilenames,
-                                                            jobjectArray fshfilenames,
+                                                            jobjectArray modelnames, jobjectArray modeltypes,
+                                                            jobjectArray mdlfilenames, jobjectArray texfilenames,
+                                                            jobjectArray vshfilenames, jobjectArray fshfilenames,
                                                             jfloatArray rotxs, jfloatArray rotys, jfloatArray rotzs,
                                                             jfloatArray posxs, jfloatArray posys, jfloatArray poszs,
                                                             jfloatArray sclxs, jfloatArray sclys, jfloatArray sclzs) {
@@ -22,21 +22,22 @@ JNIEXPORT jboolean JNICALL Java_com_tks_cppcgviewer_Jni_onStart(JNIEnv *env, jcl
 
     /* 引数チェック(md2model) */
     jsize size0 = env->GetArrayLength(modelnames);
-    jsize size1 = env->GetArrayLength(md2filenames);
-    jsize size2 = env->GetArrayLength(texfilenames);
-    jsize size3 = env->GetArrayLength(vshfilenames);
-    jsize size4 = env->GetArrayLength(fshfilenames);
-    jsize size5 = env->GetArrayLength(rotxs);
-    jsize size6 = env->GetArrayLength(rotys);
-    jsize size7 = env->GetArrayLength(rotzs);
-    jsize size8 = env->GetArrayLength(posxs);
-    jsize size9 = env->GetArrayLength(posys);
-    jsize size10= env->GetArrayLength(posxs);
-    jsize size11= env->GetArrayLength(sclxs);
-    jsize size12= env->GetArrayLength(sclys);
-    jsize size13= env->GetArrayLength(sclzs);
+    jsize size1 = env->GetArrayLength(modeltypes);
+    jsize size2 = env->GetArrayLength(mdlfilenames);
+    jsize size3 = env->GetArrayLength(texfilenames);
+    jsize size4 = env->GetArrayLength(vshfilenames);
+    jsize size5 = env->GetArrayLength(fshfilenames);
+    jsize size6 = env->GetArrayLength(rotxs);
+    jsize size7 = env->GetArrayLength(rotys);
+    jsize size8 = env->GetArrayLength(rotzs);
+    jsize size9 = env->GetArrayLength(posxs);
+    jsize size10= env->GetArrayLength(posys);
+    jsize size11= env->GetArrayLength(posxs);
+    jsize size12= env->GetArrayLength(sclxs);
+    jsize size13= env->GetArrayLength(sclys);
+    jsize size14= env->GetArrayLength(sclzs);
     /* 引数lengthが一致しなければ引数不正 */
-    if(size0 != size1 || size0 != size2 || size0 != size3 || size0 != size4 || size0 != size5 || size0 != size6 || size0 != size7 || size0 != size8 || size0 != size9 || size0 != size10 || size0 != size11 || size0 != size12 || size0 != size13) {
+    if(size0 != size1 || size0 != size2 || size0 != size3 || size0 != size4 || size0 != size5 || size0 != size6 || size0 != size7 || size0 != size8 || size0 != size9 || size0 != size10 || size0 != size11 || size0 != size12 || size0 != size13 || size0 != size14) {
         __android_log_print(ANDROID_LOG_INFO, "aaaaa", "引数不正 名称リストの数が合わない!!! modelname.size=%d md2filenames.size=%d texfilenames.size=%d vshfilenames.size=%d fshfilenames.size=%d %s %s(%d)", size0, size1, size2, size3, size4, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
         return false;
     }
@@ -61,7 +62,8 @@ JNIEXPORT jboolean JNICALL Java_com_tks_cppcgviewer_Jni_onStart(JNIEnv *env, jcl
     for(int lpct = 0; lpct < size0; lpct++) {
         /* jobjectArray -> jstring */
         jstring modelnamejstr   = (jstring)env->GetObjectArrayElement(modelnames  , lpct);
-        jstring md2filenamejstr = (jstring)env->GetObjectArrayElement(md2filenames, lpct);
+        jstring modeltypejstr   = (jstring)env->GetObjectArrayElement(modeltypes  , lpct);
+        jstring mdlfilenamejstr = (jstring)env->GetObjectArrayElement(mdlfilenames, lpct);
         jstring texfilenamejstr = (jstring)env->GetObjectArrayElement(texfilenames, lpct);
         jstring vshfilenamejstr = (jstring)env->GetObjectArrayElement(vshfilenames, lpct);
         jstring fshfilenamejstr = (jstring)env->GetObjectArrayElement(fshfilenames, lpct);
@@ -79,33 +81,34 @@ JNIEXPORT jboolean JNICALL Java_com_tks_cppcgviewer_Jni_onStart(JNIEnv *env, jcl
 
         /* jstring -> char */
         const char *modelnamechar   = env->GetStringUTFChars(modelnamejstr  , nullptr);
-        const char *md2filenamechar = env->GetStringUTFChars(md2filenamejstr, nullptr);
+        const char *modeltypechar   = env->GetStringUTFChars(modeltypejstr  , nullptr);
+        const char *mdlfilenamechar = env->GetStringUTFChars(mdlfilenamejstr, nullptr);
         const char *texfilenamechar = env->GetStringUTFChars(texfilenamejstr, nullptr);
         const char *vshfilenamechar = env->GetStringUTFChars(vshfilenamejstr, nullptr);
         const char *fshfilenamechar = env->GetStringUTFChars(fshfilenamejstr, nullptr);
 
-        /* md2関連データ一括読込み */
-        std::vector<std::pair<std::string, std::vector<char>>> wk = {{md2filenamechar, std::vector<char>()},
-                                                                     {texfilenamechar, std::vector<char>()},
-                                                                     {vshfilenamechar, std::vector<char>()},
-                                                                     {fshfilenamechar, std::vector<char>()}};
-        for(std::pair<std::string, std::vector<char>> &item : wk) {
-            const std::string &filename = item.first;
-            std::vector<char> &binbuf = item.second;
-
-            /* AAsset::open */
-            AAsset *assetFile = AAssetManager_open(assetMgr, filename.c_str(), AASSET_MODE_RANDOM);
-            if (assetFile == nullptr) {
-                __android_log_print(ANDROID_LOG_INFO, "aaaaa", "ERROR AAssetManager_open(%s) %s %s(%d)", filename.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-                return false;
-            }
-            /* 読込 */
-            int size = AAsset_getLength(assetFile);
-            binbuf.resize(size);
-            AAsset_read(assetFile, binbuf.data(), size);
-            /* AAsset::close */
-            AAsset_close(assetFile);
-        }
+//        /* mdl関連データ一括読込み */
+//        std::vector<std::pair<std::string, std::vector<char>>> wk = {{mdlfilenamechar, std::vector<char>()},
+//                                                                     {texfilenamechar, std::vector<char>()},
+//                                                                     {vshfilenamechar, std::vector<char>()},
+//                                                                     {fshfilenamechar, std::vector<char>()}};
+//        for(std::pair<std::string, std::vector<char>> &item : wk) {
+//            const std::string &filename = item.first;
+//            std::vector<char> &binbuf = item.second;
+//
+//            /* AAsset::open */
+//            AAsset *assetFile = AAssetManager_open(assetMgr, filename.c_str(), AASSET_MODE_RANDOM);
+//            if (assetFile == nullptr) {
+//                __android_log_print(ANDROID_LOG_INFO, "aaaaa", "ERROR AAssetManager_open(%s) %s %s(%d)", filename.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+//                return false;
+//            }
+//            /* 読込 */
+//            int size = AAsset_getLength(assetFile);
+//            binbuf.resize(size);
+//            AAsset_read(assetFile, binbuf.data(), size);
+//            /* AAsset::close */
+//            AAsset_close(assetFile);
+//        }
 
 //        /* Md2model追加 */
 //        gMd2Models.emplace(modelnamechar, Md2Model{ .mName=modelnamechar,
@@ -117,14 +120,16 @@ JNIEXPORT jboolean JNICALL Java_com_tks_cppcgviewer_Jni_onStart(JNIEnv *env, jcl
 
         /* char解放 */
         env->ReleaseStringUTFChars(modelnamejstr  , modelnamechar);
-        env->ReleaseStringUTFChars(md2filenamejstr, md2filenamechar);
+        env->ReleaseStringUTFChars(modeltypejstr  , modeltypechar);
+        env->ReleaseStringUTFChars(mdlfilenamejstr, mdlfilenamechar);
         env->ReleaseStringUTFChars(texfilenamejstr, texfilenamechar);
         env->ReleaseStringUTFChars(vshfilenamejstr, vshfilenamechar);
         env->ReleaseStringUTFChars(fshfilenamejstr, fshfilenamechar);
 
         /* jstring解放 */
         env->DeleteLocalRef(modelnamejstr);
-        env->DeleteLocalRef(md2filenamejstr);
+        env->DeleteLocalRef(modeltypejstr);
+        env->DeleteLocalRef(mdlfilenamejstr);
         env->DeleteLocalRef(texfilenamejstr);
         env->DeleteLocalRef(vshfilenamejstr);
         env->DeleteLocalRef(fshfilenamejstr);

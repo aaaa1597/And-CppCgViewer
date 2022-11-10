@@ -1,11 +1,9 @@
 {
-	"md2models": [
-		{ "name": "female", "model": "female.md2", "tex": "female.tga", "fsh": "shaders/basic.fsh", "vsh": "shaders/basic.vsh", "rotx" : 0, "roty" : 0, "rotz" : 0, "posx" : 0, "posy" : 0, "posz" : 0, "sclx" : 1, "scly" : 1, "sclz" : 1 },
-		{ "name": "grunt" , "model": "grunt.md2" , "tex": "grunt.tga" , "fsh": "shaders/basic.fsh", "vsh": "shaders/basic.vsh", "rotx" : 0, "roty" : 0, "rotz" : 0, "posx" : 0, "posy" : 0, "posz" : 0, "sclx" : 1, "scly" : 1, "sclz" : 1 },
-		{ "name": "frog"  , "model": "obj1.md2"  , "tex": "obj1.tga"  , "fsh": "shaders/basic.fsh", "vsh": "shaders/basic.vsh", "rotx" : 0, "roty" : 0, "rotz" : 0, "posx" : 0, "posy" : 0, "posz" : 0, "sclx" : 1, "scly" : 1, "sclz" : 1 },
-		{ "name": "paper" , "model": "obj2.md2"  , "tex": "obj2.tga"  , "fsh": "shaders/basic.fsh", "vsh": "shaders/basic.vsh", "rotx" : 0, "roty" : 0, "rotz" : 0, "posx" : 0, "posy" : 0, "posz" : 0, "sclx" : 1, "scly" : 1, "sclz" : 1 }
-	],
-	"mqomodels": [
-		{ "name": "vignette", "model": "vignette.mqo", "tex": ""      , "fsh": "shaders/texture.fsh", "vsh": "shaders/texture.vsh", "rotx" : 0, "roty" : 0, "rotz" : 0, "posx" : 0, "posy" : 0, "posz" : 0, "sclx" : 1, "scly" : 1, "sclz" : 1}
+	"models": [
+		{ "name": "female"  , "type": "md2", "model": "female.md2"  , "tex": "female.tga", "fsh": "shaders/basic.fsh"  , "vsh": "shaders/basic.vsh"  , "rotx" : 0, "roty" : 0, "rotz" : 0, "posx" : 0, "posy" : 0, "posz" : 0, "sclx" : 1, "scly" : 1, "sclz" : 1 },
+		{ "name": "grunt"   , "type": "md2", "model": "grunt.md2"   , "tex": "grunt.tga" , "fsh": "shaders/basic.fsh"  , "vsh": "shaders/basic.vsh"  , "rotx" : 0, "roty" : 0, "rotz" : 0, "posx" : 0, "posy" : 0, "posz" : 0, "sclx" : 1, "scly" : 1, "sclz" : 1 },
+		{ "name": "frog"    , "type": "md2", "model": "obj1.md2"    , "tex": "obj1.tga"  , "fsh": "shaders/basic.fsh"  , "vsh": "shaders/basic.vsh"  , "rotx" : 0, "roty" : 0, "rotz" : 0, "posx" : 0, "posy" : 0, "posz" : 0, "sclx" : 1, "scly" : 1, "sclz" : 1 },
+		{ "name": "paper"   , "type": "md2", "model": "obj2.md2"    , "tex": "obj2.tga"  , "fsh": "shaders/basic.fsh"  , "vsh": "shaders/basic.vsh"  , "rotx" : 0, "roty" : 0, "rotz" : 0, "posx" : 0, "posy" : 0, "posz" : 0, "sclx" : 1, "scly" : 1, "sclz" : 1 },
+		{ "name": "vignette", "type": "mqo", "model": "vignette.mqo", "tex": ""          , "fsh": "shaders/texture.fsh", "vsh": "shaders/texture.vsh", "rotx" : 0, "roty" : 0, "rotz" : 0, "posx" : 0, "posy" : 0, "posz" : 0, "sclx" : 1, "scly" : 1, "sclz" : 1 }
 	]
 }

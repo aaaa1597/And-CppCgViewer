@@ -10,7 +10,6 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.tks.cppcgviewer.databinding.ActivityMainBinding;
@@ -87,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         /* モデルindexファイルs(model-index.json)を取得 */
-        HashMap<String, ModelIndex> md2modelindex = new HashMap<>();
+        HashMap<String, ModelIndex> modelsindex = new HashMap<>();
         try {
             /* indexファイル読込み */
             InputStream fileInputStream = getAssets().open("model-index.json");
@@ -98,13 +97,14 @@ public class MainActivity extends AppCompatActivity {
             Log.i("index-content:", readString);
             /* jsonパース */
             JSONObject jsonObject = new JSONObject(readString);
-            /* jsonパース(md2モデル) */
-            JSONArray jsonmd2array = jsonObject.getJSONArray("md2models");
+            /* jsonパース(モデル) */
+            JSONArray jsonmd2array = jsonObject.getJSONArray("models");
             for(int lpct = 0; lpct < jsonmd2array.length(); lpct++) {
                 JSONObject md2model = jsonmd2array.getJSONObject(lpct);
                 ModelIndex mi = new ModelIndex() {{
                     modelname = md2model.getString("name");
-                    md2filename = md2model.getString("model");
+                    modeltype = md2model.getString("type");
+                    mdlfilename = md2model.getString("model");
                     texfilename = md2model.getString("tex");
                     vshfilename = md2model.getString("vsh");
                     fshfilename = md2model.getString("fsh");
@@ -118,29 +118,7 @@ public class MainActivity extends AppCompatActivity {
                     scly = (float) md2model.getDouble("scly");
                     sclz = (float) md2model.getDouble("sclz");
                 }};
-                md2modelindex.put(mi.modelname, mi);
-            }
-            /* jsonパース(mqoモデル) */
-            JSONArray jsonmqoarray = jsonObject.getJSONArray("mqomodels");
-            for(int lpct = 0; lpct < jsonmqoarray.length(); lpct++) {
-                JSONObject md2model = jsonmqoarray.getJSONObject(lpct);
-                ModelIndex mi = new ModelIndex() {{
-                    modelname  =md2model.getString("name");
-                    md2filename=md2model.getString("model");
-                    texfilename=md2model.getString("tex");
-                    vshfilename=md2model.getString("vsh");
-                    fshfilename=md2model.getString("fsh");
-                    rotx=(float)md2model.getDouble("rotx");
-                    roty=(float)md2model.getDouble("roty");
-                    rotz=(float)md2model.getDouble("rotz");
-                    posx=(float)md2model.getDouble("posx");
-                    posz=(float)md2model.getDouble("posy");
-                    posz=(float)md2model.getDouble("posz");
-                    sclx=(float)md2model.getDouble("sclx");
-                    scly=(float)md2model.getDouble("scly");
-                    sclz=(float)md2model.getDouble("sclz");
-                }};
-                md2modelindex.put(mi.modelname, mi);
+                modelsindex.put(mi.modelname, mi);
             }
         }
         catch(IOException | JSONException e) {
@@ -149,29 +127,31 @@ public class MainActivity extends AppCompatActivity {
             new Handler().postDelayed(() -> MainActivity.this.finish(), 10000);
         }
 
-        Log.d("aaaaa", "model数=" + md2modelindex.size());
-        for (Map.Entry<String, ModelIndex> item : md2modelindex.entrySet())
-            System.out.println(item.getKey() + " => " + item.getValue().md2filename + " : " + item.getValue().texfilename + " : " + item.getValue().vshfilename + " : " + item.getValue().fshfilename);
+        Log.d("aaaaa", "model数=" + modelsindex.size());
+        for (Map.Entry<String, ModelIndex> item : modelsindex.entrySet())
+            System.out.println(item.getKey() + " => " + item.getValue().mdlfilename + " : " + item.getValue().texfilename + " : " + item.getValue().vshfilename + " : " + item.getValue().fshfilename);
 
         /* cpp側 初期化 */
-        String[] modelnames   = new String[md2modelindex.size()];
-        String[] md2filenames = new String[md2modelindex.size()];
-        String[] texfilenames = new String[md2modelindex.size()];
-        String[] vshfilenames = new String[md2modelindex.size()];
-        String[] fshfilenames = new String[md2modelindex.size()];
-        float[] rotxs = new float[md2modelindex.size()];
-        float[] rotys = new float[md2modelindex.size()];
-        float[] rotzs = new float[md2modelindex.size()];
-        float[] posxs = new float[md2modelindex.size()];
-        float[] posys = new float[md2modelindex.size()];
-        float[] poszs = new float[md2modelindex.size()];
-        float[] sclxs = new float[md2modelindex.size()];
-        float[] sclys = new float[md2modelindex.size()];
-        float[] sclzs = new float[md2modelindex.size()];
+        String[] modelnames   = new String[modelsindex.size()];
+        String[] modeltypes   = new String[modelsindex.size()];
+        String[] md2filenames = new String[modelsindex.size()];
+        String[] texfilenames = new String[modelsindex.size()];
+        String[] vshfilenames = new String[modelsindex.size()];
+        String[] fshfilenames = new String[modelsindex.size()];
+        float[] rotxs = new float[modelsindex.size()];
+        float[] rotys = new float[modelsindex.size()];
+        float[] rotzs = new float[modelsindex.size()];
+        float[] posxs = new float[modelsindex.size()];
+        float[] posys = new float[modelsindex.size()];
+        float[] poszs = new float[modelsindex.size()];
+        float[] sclxs = new float[modelsindex.size()];
+        float[] sclys = new float[modelsindex.size()];
+        float[] sclzs = new float[modelsindex.size()];
         int lpct = 0;
-        for(Map.Entry<String, ModelIndex> item : md2modelindex.entrySet()) {
+        for(Map.Entry<String, ModelIndex> item : modelsindex.entrySet()) {
             modelnames  [lpct] = item.getKey();
-            md2filenames[lpct] = item.getValue().md2filename;
+            modeltypes  [lpct] = item.getValue().modeltype;
+            md2filenames[lpct] = item.getValue().mdlfilename;
             texfilenames[lpct] = item.getValue().texfilename;
             vshfilenames[lpct] = item.getValue().vshfilename;
             fshfilenames[lpct] = item.getValue().fshfilename;
@@ -188,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         /* onStart */
-        Jni.onStart(getResources().getAssets(), modelnames, md2filenames, texfilenames, vshfilenames, fshfilenames, rotxs, rotys, rotzs, posxs, posys, poszs, sclxs, sclys, sclzs );
+        Jni.onStart(getResources().getAssets(), modelnames, modeltypes, md2filenames, texfilenames, vshfilenames, fshfilenames, rotxs, rotys, rotzs, posxs, posys, poszs, sclxs, sclys, sclzs );
     }
 
     @Override
@@ -228,7 +208,8 @@ public class MainActivity extends AppCompatActivity {
 
     static class ModelIndex {
         public String modelname;
-        public String md2filename;
+        public String modeltype;
+        public String mdlfilename;
         public String texfilename;
         public String vshfilename;
         public String fshfilename;

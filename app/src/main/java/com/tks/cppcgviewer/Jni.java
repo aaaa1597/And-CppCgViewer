@@ -7,7 +7,7 @@ public class Jni {
     static {
         System.loadLibrary("cppcgviewer");
     }
-    public static native boolean onStart(AssetManager assets, String[] modelnames, String[] md2filenames, String[] texfilenames, String[] vshfilenames, String[] fshfilenames, float[] rotxs, float[] rotys, float[] rotzs, float[] posxs, float[] posys, float[] poszs, float[] sclxs, float[] sclys, float[] sclzs);
+    public static native boolean onStart(AssetManager assets, String[] modelnames, String[] modeltypes, String[] mdlfilenames, String[] texfilenames, String[] vshfilenames, String[] fshfilenames, float[] rotxs, float[] rotys, float[] rotzs, float[] posxs, float[] posys, float[] poszs, float[] sclxs, float[] sclys, float[] sclzs);
     public static native void surfaceCreated(Surface surface);
     public static native void surfaceChanged(int width, int height);
     public static native void surfaceDestroyed();
