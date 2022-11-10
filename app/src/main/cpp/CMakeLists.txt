@@ -6,4 +6,4 @@ add_library(cppcgviewer SHARED Jni.cpp)
 
 find_library(log-lib log)
 
-target_link_libraries(cppcgviewer ${log-lib})
+target_link_libraries(cppcgviewer ${log-lib} android)
